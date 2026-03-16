@@ -14,6 +14,10 @@ Kherson Oblast is one of the most agriculturally significant regions in Europe. 
 
 The Kherson watermelon holds Geographical Indication (GI) status — the same legal protection as Champagne or Parmigiano-Reggiano. The combination of chernozem richness, southern sunshine, sandy soil texture in the lower Dnipro region, and the stress of a hot dry continental summer produces fruit with a sweetness and flavour that farmers and Ukrainians who grew up eating it describe as irreplaceable. This is not marketing. It is the accumulated agricultural identity of a region and a people.
 
+During the Russian occupation, farmers in the region who had always grown watermelons were unable to do so. In that absence, the watermelon became a symbol — of Kherson, of occupation, of what had been taken. At the Ukrainian stand at COP27, a watermelon was displayed alongside a Ukrainian flag. When President Zelenskyy arrived in newly liberated Kherson in November 2022, he joked that he had come because he "wanted a watermelon." Ukrposhta, the Ukrainian national postal service, released watermelon-themed stamps commemorating the liberation. A fruit became a flag.
+
+This is why Mykola grows watermelons and not something else. The choice is not incidental.
+
 ---
 
 ## What we know — the conflict and the ecocide
