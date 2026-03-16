@@ -1,0 +1,103 @@
+# TerraSensus Sensor Simulator Configuration
+
+publish:
+  interval_seconds: 30        # how often readings are published to Pub/Sub
+  pubsub_topic: terrasensus-sensor-readings
+
+plots:
+  - id: plot-001
+    name: North Field
+    latitude: 51.5074
+    longitude: -0.1278
+    crop: wheat
+    area_ha: 12.5
+
+  - id: plot-002
+    name: South Orchard
+    latitude: 51.4950
+    longitude: -0.1350
+    crop: apple
+    area_ha: 4.2
+
+  - id: plot-003
+    name: East Pasture
+    latitude: 51.5200
+    longitude: -0.1100
+    crop: barley
+    area_ha: 8.0
+
+sensors:
+  moisture:
+    unit: "%"
+    baseline: 35.0
+    drift_per_hour: -0.3         # slowly dries out
+    noise_sigma: 0.8
+    min: 0.0
+    max: 100.0
+
+  temperature:
+    unit: "°C"
+    baseline: 18.0
+    drift_per_hour: 0.0          # follows diurnal cycle instead
+    noise_sigma: 0.3
+    min: -5.0
+    max: 45.0
+
+  ph:
+    unit: ""
+    baseline: 6.8
+    drift_per_hour: 0.001        # very slow natural drift
+    noise_sigma: 0.05
+    min: 3.5
+    max: 9.5
+
+  nitrogen:
+    unit: "mg/kg"
+    baseline: 85.0
+    drift_per_hour: -0.02
+    noise_sigma: 1.5
+    min: 0.0
+    max: 250.0
+
+  phosphorus:
+    unit: "mg/kg"
+    baseline: 45.0
+    drift_per_hour: -0.01
+    noise_sigma: 0.8
+    min: 0.0
+    max: 200.0
+
+  potassium:
+    unit: "mg/kg"
+    baseline: 130.0
+    drift_per_hour: -0.015
+    noise_sigma: 2.0
+    min: 0.0
+    max: 400.0
+
+  ec:
+    unit: "dS/m"
+    baseline: 1.1
+    drift_per_hour: 0.002
+    noise_sigma: 0.03
+    min: 0.0
+    max: 6.0
+
+weather_events:
+  rain:
+    probability_per_hour: 0.05   # 5% chance of rain event each hour
+    moisture_spike: 20.0         # moisture increases by up to 20%
+    duration_hours: 2
+
+  drought:
+    trigger_days_no_rain: 14     # trigger drought mode after 14 dry days
+    drift_multiplier: 3.0        # moisture drops 3x faster
+
+  heatwave:
+    probability_per_hour: 0.01
+    temp_increase: 8.0
+    duration_hours: 48
+
+lab_report:
+  output_dir: simulator/output/lab_reports
+  plots_per_batch: 3

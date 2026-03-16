@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main, staging]
+
+jobs:
+  lint-test-ingestion:
+    name: ingestion — lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r services/ingestion/requirements.txt ruff pytest
+      - run: ruff check services/ingestion
+      - run: pytest services/ingestion/tests -v
+
+  lint-test-alert-engine:
+    name: alert-engine — lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r services/alert-engine/requirements.txt ruff pytest
+      - run: ruff check services/alert-engine
+      - run: pytest services/alert-engine/tests -v
+
+  lint-test-ai-recommendations:
+    name: ai-recommendations — lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r services/ai-recommendations/requirements.txt ruff pytest
+      - run: ruff check services/ai-recommendations
+      - run: pytest services/ai-recommendations/tests -v
+
+  lint-test-lab-parser:
+    name: lab-parser — lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r services/lab-parser/requirements.txt ruff pytest
+      - run: ruff check services/lab-parser
+      - run: pytest services/lab-parser/tests -v
+
+  lint-test-mobile:
+    name: mobile — typecheck + lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: cd mobile && npm ci
+      - run: cd mobile && npx tsc --noEmit
+      - run: cd mobile && npm run lint
+      - run: cd mobile && npm test -- --watchAll=false
+
+  lint-test-web:
+    name: web — typecheck + lint + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: cd web && npm ci
+      - run: cd web && npx tsc --noEmit
+      - run: cd web && npm run lint
+      - run: cd web && npm test -- --watchAll=false
+
+  lint-simulator:
+    name: simulator — lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff && ruff check simulator/
+
+  dbt-parse:
+    name: dbt — parse check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install dbt-bigquery
+      - run: cd elt/dbt && dbt parse

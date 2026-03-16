@@ -1,0 +1,56 @@
+# Environment & secrets
+.env
+.env.*
+*.key
+*.pem
+service-account.json
+gcp-credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Node / JS
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+.expo/
+.expo-shared/
+
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/.terraform.lock.hcl
+infra/terraform.tfvars
+
+# dbt
+elt/dbt/target/
+elt/dbt/dbt_packages/
+elt/dbt/logs/
+
+# Simulator output (generated PDFs)
+simulator/output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Claude Code session logs (auto-generated)
+.claude/session-log.txt

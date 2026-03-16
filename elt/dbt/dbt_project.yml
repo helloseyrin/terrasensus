@@ -1,0 +1,19 @@
+name: terrasensus
+version: "1.0.0"
+config-version: 2
+
+profile: terrasensus
+
+model-paths: ["models"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  terrasensus:
+    staging:
+      +materialized: view          # cheap, always fresh
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table         # pre-aggregated for Looker Studio / Grafana
