@@ -28,6 +28,13 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 - `shared/types/` — Shared TypeScript types (sensor, lab_report, alert)
 - `grafana/` — Exported Grafana dashboard JSON configs
 
+## Data Processing Library Preference
+- **Use Polars, not pandas** for all DataFrame/tabular data processing in Python services
+- Polars uses Apache Arrow + multi-threaded Rust engine — significantly faster for sensor time-series aggregations
+- See ADR 005 for rationale
+- Use `polars.LazyFrame` (lazy evaluation) for batch processing; `polars.DataFrame` for small in-memory operations
+- Polars SQL context (`pl.SQLContext`) is acceptable for team members who prefer SQL syntax
+
 ## Conventions
 - Every service has: `Dockerfile`, `tests/` directory, environment config via `.env`
 - dbt models follow strict layering: `staging/` → `intermediate/` → `marts/`
