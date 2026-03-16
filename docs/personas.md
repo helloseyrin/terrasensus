@@ -50,9 +50,12 @@ Mykola farms conventionally — synthetic fertilisers, irrigation, standard inpu
 - Drought risk scoring from moisture trend + rainfall data — irrigation timing support during fruit-set
 - Fertiliser ROI tracking — connects his applications (logged as activity_log entries) to soil readings at the time
 
-### The Kherson context
+<details>
+<summary>⚠ Developer note — Kherson context, occupation, Kakhovka ecocide (written by the repo owner, who is Ukrainian)</summary>
 
-*This section exists because using a real region as a simulation backdrop requires honesty about what that region is.*
+The Kherson watermelon is not just an agricultural product. During the Russian occupation, farmers in the region who had always grown watermelons were unable to do so. In that absence the watermelon became a symbol — of Kherson, of what had been taken, of the region itself. At the Ukrainian stand at COP27, a watermelon was displayed alongside a Ukrainian flag. When President Zelenskyy arrived in newly liberated Kherson in November 2022, he joked that he had come because he "wanted a watermelon." Ukrposhta, the Ukrainian national postal service, released watermelon-themed stamps commemorating the liberation. A fruit became a flag. This is why Mykola grows watermelons and not something else. The choice is not incidental.
+
+---
 
 Kherson city was occupied by Russian forces in February 2022 and de-occupied by Ukrainian forces in November 2022. Parts of Kherson Oblast — primarily the left bank of the Dnipro — remain under Russian occupation. Drone strikes, shelling, and active combat continue across the region. Farming on the Ukrainian-controlled right bank continues under these conditions.
 
@@ -64,12 +67,16 @@ The ecological consequences are still unfolding. The lower Dnipro floodplain —
 
 This was not a flood. It was the destruction of a region — its infrastructure, its ecology, its animals, and some of its people — in a matter of hours. The UN and international environmental law organisations have described it as ecocide. That word is accurate.
 
+---
+
 **What this means for TerraSensus design:**
 
 - Offline-first is not a convenience here. It is a requirement. Power and internet outages are routine in this region. The rule-based alert engine must fire with no network access. The mobile app must serve cached readings with no connectivity.
 - Remote monitoring matters more than field access. Sensor data viewed from shelter, from a different city, or from abroad may be the primary interaction mode for a farmer in this region.
 - TerraSensus's seven sensors measure N-P-K-pH-EC-moisture-temperature. They cannot detect explosive residue (RDX, heavy metals), hydrocarbon contamination from military vehicles, or the full chemical composition of what the Kakhovka flood deposited. The app must not imply completeness. The agronomist disclaimer is especially load-bearing here.
 - The simulation uses pre-2022 agronomic baselines. The repo owner is Ukrainian but does not have direct contact with farmers currently operating in Kherson Oblast and has not validated these assumptions with people living there. If this app ever moves beyond demonstration in this context, that conversation must happen first.
+
+</details>
 
 ---
 

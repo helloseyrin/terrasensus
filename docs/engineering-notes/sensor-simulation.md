@@ -103,7 +103,7 @@ This has concrete implications for TerraSensus design:
 - **Soil contamination beyond N-P-K.** Flooding from the dam destruction, fuel from military vehicles, and unexploded ordnance all affect soil chemistry in ways that go beyond TerraSensus's seven sensors. The app should not imply completeness — a damaged plot in Kherson may need heavy metal testing and contamination mapping that TerraSensus cannot provide. The agronomist disclaimer is especially important here.
 - **We do not know the current ground truth.** Without direct contact with farmers currently operating in Kherson Oblast, TerraSensus's representation of this context is necessarily approximate. The simulation uses pre-2022 agronomic baselines. A farmer in this region today is dealing with realities that no soil model can accurately capture from the outside. If this app is ever deployed beyond demonstration, Kherson-region farmers must be involved in validating what the app shows and says about their land.
 
-See `docs/engineering-notes/kherson-context.md` for the full account of what is known, what is not known, and what the Kakhovka dam destruction means for any deployment of this software in conflict-affected agricultural regions.
+See the Mykola section of `docs/personas.md` for the full account — including the watermelon as a symbol of liberation, the Kakhovka ecocide, and what this means for any deployment of this software in conflict-affected agricultural regions.
 
 ### Fatima Yusupova — Cotton, Ferghana Valley, Uzbekistan (`plot-uzb-001`)
 **Soil type**: Serozem (grey desert soil) — thin, low organic matter, naturally alkaline.
