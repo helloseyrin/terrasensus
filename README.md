@@ -57,7 +57,7 @@ Push notifications: Firebase Cloud Messaging (critical alerts)
 | Operational DB | Cloud SQL (PostgreSQL) |
 | Analytics DB | BigQuery (via GCP Datastream) |
 | ELT transforms | dbt (staging → intermediate → marts) |
-| AI layer | Vertex AI (Gemini Pro) |
+| AI layer | Multi-model fallback chain: Vertex AI (Gemini Pro) → Claude Sonnet → rule-based local |
 | Document parsing | Google Cloud Document AI + Gemini Vision |
 | File storage | Google Cloud Storage |
 | Push notifications | Firebase Cloud Messaging |
@@ -160,9 +160,10 @@ terrasensus/
 │   └── workflows/          # ci.yml, deploy-staging.yml
 ├── .claude/                # Claude Code settings + session audit log
 ├── docs/
-│   ├── ADR/                # Architecture Decision Records (001–005)
-│   ├── engineering-notes/  # sensor simulation, ELT, AI, data model, cost-benefit
+│   ├── ADR/                # Architecture Decision Records (001–006)
+│   ├── engineering-notes/  # sensor simulation, ELT, AI, data model, cost-benefit, kherson-context
 │   ├── specs/              # design documents
+│   ├── ai-usage-policy.md  # where AI is and is not acceptable (read before touching AI code)
 │   ├── business-case.md    # problem statement, market opportunity, known unknowns
 │   ├── competitive-analysis.md  # all four repos + farmer insights + CI/CD learnings
 │   ├── backlog.md          # feature backlog (v1 → v3 + icebox)
@@ -188,7 +189,8 @@ terrasensus/
 │   ├── lab_report.ts       # LabReport, LabResults
 │   ├── alert.ts            # Alert, DroughtAlert
 │   ├── activity_log.ts     # ActivityLog, Quantity, CropCycle, PlotGeometry
-│   └── cost_benefit.ts     # FertiliserApplication, EcologicalImpact, SeasonROIReport
+│   ├── cost_benefit.ts     # FertiliserApplication, EcologicalImpact, SeasonROIReport
+│   └── onboarding.ts       # PlotRegistration, WatchListItem, OnboardingResponse
 ├── grafana/dashboards/     # exported Grafana dashboard JSON
 ├── CLAUDE.md               # Claude Code project memory (read at session start)
 ├── CHANGELOG.md

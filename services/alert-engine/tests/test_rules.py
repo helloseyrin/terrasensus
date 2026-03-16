@@ -27,32 +27,47 @@ class TestGlobalDefaults:
         assert evaluate("unknown_sensor", 99.9) is None
 
 
-class TestMykolaWheat:
+class TestMykolaWatermelon:
     """
-    Plot: Mykola's wheat field, Kherson Oblast, Ukraine.
-    Chernozem soil, heavy N use, EC risk from synthetic fertiliser.
+    Plot: Mykola's watermelon field, Kherson Oblast, Ukraine.
+    Chernozem soil, Kherson watermelon variety. K-critical fruiting crop.
+    N must be managed carefully — too high drives vine, not fruit.
     """
-    crop = "wheat"
+    crop = "watermelon"
 
-    def test_wheat_higher_n_tolerance_than_global(self):
-        # Wheat healthy N range is 50–160, global is 30–150
-        # N=35 should be warning for wheat but fine for global default (low=30)
-        result = evaluate("nitrogen", 35.0, crop=self.crop)
-        assert result is not None
-        assert result["direction"] == "low"
+    def test_watermelon_n_ceiling_lower_than_global(self):
+        # N=160 is comfortably healthy globally (high=150 is close but critical_high=180)
+        # For watermelon, N=160 is well above critical_high=120 — over-fertilisation
+        global_result = evaluate("nitrogen", 110.0)
+        watermelon_result = evaluate("nitrogen", 110.0, crop=self.crop)
+        assert global_result is None                       # global: 110 is healthy (high=150)
+        assert watermelon_result is not None               # watermelon: 110 is critical (critical_high=120)
+        assert watermelon_result["direction"] == "high"
 
-    def test_wheat_ec_higher_tolerance(self):
-        # Wheat critical EC is 3.5 vs global 3.0
-        # EC=3.2 is critical for global but only warning for wheat
-        global_result = evaluate("ec", 3.2)
-        wheat_result = evaluate("ec", 3.2, crop=self.crop)
-        assert global_result["level"] == "critical"
-        assert wheat_result["level"] == "warning"
+    def test_watermelon_cold_soil_alerts_earlier(self):
+        # Watermelons need warm soil — critical below 8°C, global critical is 2°C
+        # Temperature=10 is fine globally but is a warning for watermelon (low=16)
+        global_result = evaluate("temperature", 10.0)
+        watermelon_result = evaluate("temperature", 10.0, crop=self.crop)
+        assert global_result is None                       # global: 10°C is healthy (low=5)
+        assert watermelon_result is not None               # watermelon: 10°C is warning (low=16)
 
-    def test_wheat_normal_operating_range(self):
-        assert evaluate("nitrogen", 120.0, crop=self.crop) is None
-        assert evaluate("ph", 6.8, crop=self.crop) is None
-        assert evaluate("ec", 0.9, crop=self.crop) is None
+    def test_watermelon_k_low_alerts(self):
+        # K=100 is healthy globally (low=80) but warning for watermelon (low=130)
+        global_result = evaluate("potassium", 100.0)
+        watermelon_result = evaluate("potassium", 100.0, crop=self.crop)
+        assert global_result is None                       # global: 100 is healthy
+        assert watermelon_result is not None               # watermelon: below K floor for fruit quality
+        assert watermelon_result["direction"] == "low"
+
+    def test_watermelon_baseline_all_normal(self):
+        # Mykola's baselines should all read as healthy for watermelon
+        assert evaluate("moisture", 44.0, crop=self.crop) is None
+        assert evaluate("temperature", 22.0, crop=self.crop) is None
+        assert evaluate("ph", 6.5, crop=self.crop) is None
+        assert evaluate("nitrogen", 65.0, crop=self.crop) is None
+        assert evaluate("potassium", 165.0, crop=self.crop) is None
+        assert evaluate("ec", 0.8, crop=self.crop) is None
 
 
 class TestFatimaCotton:
@@ -138,3 +153,8 @@ class TestGetThresholds:
         # Cotton doesn't override moisture — should get global value
         t = get_thresholds("cotton")
         assert t["moisture"]["critical_low"] == 10  # global
+
+    def test_watermelon_n_ceiling_lower_than_global(self):
+        t = get_thresholds("watermelon")
+        assert t["nitrogen"]["critical_high"] == 120   # watermelon override
+        assert get_thresholds()["nitrogen"]["critical_high"] == 180  # global default

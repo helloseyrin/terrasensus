@@ -19,13 +19,14 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 - **Dashboards**: Grafana (real-time, Cloud SQL) + Looker Studio (analytics, BigQuery)
 
 ## Repository Structure
-- `services/` — FastAPI microservices (ingestion, alert-engine, ai-recommendations, lab-parser)
+- `services/` — FastAPI microservices (ingestion, alert-engine, ai-recommendations, lab-parser); `ai-recommendations/client.py` is the multi-model fallback chain
 - `simulator/` — Sensor time-series generator + lab report PDF generator
 - `elt/` — dbt project (staging → intermediate → marts) + Datastream config
 - `mobile/` — React Native (Expo) app
 - `web/` — Next.js web dashboard
 - `infra/` — Terraform for all GCP resources
-- `shared/types/` — Shared TypeScript types (sensor, lab_report, alert)
+- `shared/types/` — Shared TypeScript types (sensor, lab_report, alert, activity_log, cost_benefit, onboarding)
+- `docs/engineering-notes/kherson-context.md` — honest account of what is and isn't known about farming in Kherson Oblast under conflict; read before modifying the Mykola persona
 - `grafana/` — Exported Grafana dashboard JSON configs
 
 ## Data Processing Library Preference
@@ -69,9 +70,21 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 ## Architecture Decisions
 - **ELT over ETL**: Raw data loads into Cloud SQL first, Datastream syncs to BigQuery, dbt transforms — preserves raw data, enables re-transformation
 - **Expo over SwiftUI**: Code sharing with Next.js web layer, JS familiarity, React Native new architecture is native-speed for data-display apps
-- **Gemini over Claude for AI layer**: GCP-native, avoids external API dependency, Vertex AI IAM integrates cleanly with rest of GCP stack
-- **Hybrid alert system**: Rule-based engine for instant critical alerts (no latency), Gemini for deep soil analysis and supplier recommendations
+- **Multi-model fallback chain (ADR 006)**: Gemini Pro primary (GCP IAM, native), Claude Sonnet fallback (separate AWS infrastructure — GCP outage won't affect it), rule-based local always available. Correctness failures (wrong values) caught by `client.py: check_bounds()` before display. See `docs/engineering-notes/ai-resilience.md`.
+- **Hybrid alert system**: Rule-based engine for instant critical alerts (no latency, no AI), Gemini for deep soil analysis and supplier recommendations
 - **Document AI + Gemini Vision**: Document AI for structured lab PDFs, Gemini Vision as fallback for scanned/unstructured reports
+
+## Simulation Personas
+
+Three plots in `simulator/config.yaml` — each represents a real-world edge case:
+
+| Plot ID | Farmer | Region | Crop | Key characteristic |
+|---|---|---|---|---|
+| plot-ukr-001 | Mykola | Kherson Oblast, Ukraine | Watermelon (GI) | Sandy chernozem, continental climate; K-critical fruiting crop, N ceiling lower than global defaults |
+| plot-uzb-001 | Fatima | Ferghana Valley, Uzbekistan | Cotton | Arid, EC already at 2.4 dS/m (warning from day one) |
+| plot-ore-001 | Elena | Willamette Valley, Oregon | Pinot Noir | Maritime, low N (38 mg/kg) is intentional — would false-alarm on global defaults |
+
+Crop-aware thresholds in `rules.py` exist specifically because: cotton tolerates higher EC; pinot_noir intentionally runs low N; wheat needs higher N than global defaults.
 
 ## Sensor Data Ranges (for simulation)
 | Sensor | Unit | Healthy Range | Critical Low | Critical High |
@@ -83,6 +96,8 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 | Phosphorus | mg/kg | 20–80 | <15 | >120 |
 | Potassium | mg/kg | 80–200 | <50 | >250 |
 | EC | dS/m | 0.5–2.0 | <0.2 | >3.0 |
+
+Crop-aware overrides in `services/alert-engine/rules.py: CROP_THRESHOLDS` — wheat, cotton, and pinot_noir each have sensor-specific threshold adjustments that take precedence over the global table above. See `get_thresholds(crop)`.
 
 ## Lab Report Schema (extracted fields)
 pH, N (mg/kg), P (mg/kg), K (mg/kg), EC (dS/m), Organic Matter (%), CEC (meq/100g), Ca (mg/kg), Mg (mg/kg), Zn (mg/kg), Fe (mg/kg), sand (%), silt (%), clay (%), sample_depth_cm, plot_id

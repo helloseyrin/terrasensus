@@ -9,28 +9,34 @@ publish:
 
 plots:
   - id: plot-ukr-001
-    name: "Mykola's Wheat Field"
+    name: "Mykola's Watermelon Field"
     farmer_name: Mykola Petrenko
     region: "Kherson Oblast, Ukraine"
     climate_zone: continental
-    crop: wheat
-    variety: "Triticum aestivum (winter wheat)"
+    crop: watermelon
+    variety: "Citrullus lanatus (Kherson watermelon)"
     area_ha: 50.0
     latitude: 46.6354
     longitude: 32.6169
     farming_style: conventional
-    # Chernozem (black earth) — world's most fertile topsoil.
-    # Naturally high organic matter, K-rich. Synthetic N use is heavy.
-    # EC will trend upward over time from fertiliser accumulation.
-    # Drought risk July–August (continental dry season).
+    # Chernozem (black earth) + sandy alluvial soil near the lower Dnipro.
+    # Kherson watermelons hold Geographical Indication (GI) status — the same
+    # protection as Champagne. The specific combination of soil, southern sun,
+    # and hot dry continental summer produces a sweetness that is regionally
+    # distinctive and widely considered irreplaceable by those who grew up with it.
+    # K is critical — drives fruit sugar, flesh density, and shelf life.
+    # N must be managed carefully: too much drives vine growth, not fruit.
+    # Warm soil temperature essential — cold soil stunts growth.
+    # Drought risk July–August but watermelons tolerate short dry spells
+    # once established; critical during fruit set.
     sensor_baselines:
-      moisture: 38.0
-      temperature: 14.0
-      ph: 6.8
-      nitrogen: 120.0
-      phosphorus: 55.0
-      potassium: 180.0
-      ec: 0.9
+      moisture: 44.0
+      temperature: 22.0
+      ph: 6.5
+      nitrogen: 65.0
+      phosphorus: 45.0
+      potassium: 165.0
+      ec: 0.8
 
   - id: plot-uzb-001
     name: "Fatima's Cotton Fields"

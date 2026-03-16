@@ -63,6 +63,31 @@ CROP_THRESHOLDS: dict[str, dict] = {
         # conservative estimates from Oregon extension service literature.
     },
 
+    "watermelon": {
+        # Citrullus lanatus — Kherson Oblast, Ukraine. Warm season cucurbit.
+        # Kherson's black earth (chernozem) and hot dry summers produce
+        # watermelons of exceptional sweetness — a product of high K, controlled N,
+        # and the stress of a continental summer encouraging sugar concentration.
+        #
+        # N: fruiting crop — excess N drives vine growth at the expense of fruit
+        # sugar and quality. Lower N ceiling than wheat or global defaults.
+        # Same logic as Pinot Noir but in the high direction: we need to catch
+        # N creeping too high, not accept low N.
+        #
+        # K: most important nutrient for watermelon fruit quality. Higher floor
+        # than global defaults — below 130 mg/kg starts affecting sweetness and
+        # flesh structure.
+        #
+        # Temperature: cold-sensitive. Soil below 16°C stunts growth and delays
+        # germination. Critical below 8°C. Warm season — not a frost-tolerant crop.
+        "nitrogen":    {"critical_low": 15,  "low": 30,  "high": 90,  "critical_high": 120, "unit": "mg/kg"},
+        "potassium":   {"critical_low": 80,  "low": 130, "high": 220, "critical_high": 280, "unit": "mg/kg"},
+        "temperature": {"critical_low": 8,   "low": 16,  "high": 36,  "critical_high": 42,  "unit": "°C"},
+        "moisture":    {"critical_low": 15,  "low": 35,  "high": 70,  "critical_high": 85,  "unit": "%"},
+        # ⚠ UNVALIDATED — based on general cucurbit agronomy literature.
+        # Kherson-specific values require review by a Ukrainian agronomist.
+    },
+
     # Add new crops here following the same pattern.
     # Only override sensors where this crop differs from global THRESHOLDS.
     # Always add an ⚠ UNVALIDATED comment until reviewed by a domain expert.
