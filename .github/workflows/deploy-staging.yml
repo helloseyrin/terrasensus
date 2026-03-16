@@ -1,8 +1,10 @@
 name: Deploy to Staging
 
 on:
+  workflow_dispatch:  # manual trigger from GitHub Actions UI
   push:
-    branches: [main]
+    tags:
+      - "staging-*"  # push a tag like `staging-2026-03-16` to deploy
 
 jobs:
   deploy-ingestion:
