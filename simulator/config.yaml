@@ -1,97 +1,169 @@
 # TerraSensus Sensor Simulator Configuration
+# Three agronomically distinct plots representing different climates,
+# crops, and farming philosophies — designed to trigger different
+# alert types and AI recommendation paths.
 
 publish:
-  interval_seconds: 30        # how often readings are published to Pub/Sub
+  interval_seconds: 30
   pubsub_topic: terrasensus-sensor-readings
 
 plots:
-  - id: plot-001
-    name: North Field
-    latitude: 51.5074
-    longitude: -0.1278
+  - id: plot-ukr-001
+    name: "Mykola's Wheat Field"
+    farmer_name: Mykola Petrenko
+    region: "Kherson Oblast, Ukraine"
+    climate_zone: continental
     crop: wheat
-    area_ha: 12.5
+    variety: "Triticum aestivum (winter wheat)"
+    area_ha: 50.0
+    latitude: 46.6354
+    longitude: 32.6169
+    farming_style: conventional
+    # Chernozem (black earth) — world's most fertile topsoil.
+    # Naturally high organic matter, K-rich. Synthetic N use is heavy.
+    # EC will trend upward over time from fertiliser accumulation.
+    # Drought risk July–August (continental dry season).
+    sensor_baselines:
+      moisture: 38.0
+      temperature: 14.0
+      ph: 6.8
+      nitrogen: 120.0
+      phosphorus: 55.0
+      potassium: 180.0
+      ec: 0.9
 
-  - id: plot-002
-    name: South Orchard
-    latitude: 51.4950
-    longitude: -0.1350
-    crop: apple
-    area_ha: 4.2
+  - id: plot-uzb-001
+    name: "Fatima's Cotton Fields"
+    farmer_name: Fatima Yusupova
+    region: "Ferghana Valley, Uzbekistan"
+    climate_zone: arid
+    crop: cotton
+    variety: "Gossypium hirsutum (upland cotton)"
+    area_ha: 30.0
+    latitude: 40.3864
+    longitude: 71.7864
+    farming_style: conventional
+    # Serozem (grey desert soil) — thin, low OM, naturally alkaline.
+    # Flood irrigation with saline water drives EC dangerously high.
+    # This is the ecological stress case: cotton monoculture + over-irrigation
+    # caused the Aral Sea disaster. EC is already in warning range at baseline.
+    # Extreme summer heat (40°C+). Drought between irrigation cycles.
+    sensor_baselines:
+      moisture: 18.0
+      temperature: 28.0
+      ph: 7.9
+      nitrogen: 45.0
+      phosphorus: 28.0
+      potassium: 95.0
+      ec: 2.4       # deliberately in warning range — salt accumulation
 
-  - id: plot-003
-    name: East Pasture
-    latitude: 51.5200
-    longitude: -0.1100
-    crop: barley
+  - id: plot-ore-001
+    name: "Elena's Vineyard"
+    farmer_name: Elena Marchetti
+    region: "Willamette Valley, Oregon, USA"
+    climate_zone: maritime
+    crop: pinot_noir
+    variety: "Vitis vinifera (Pinot Noir)"
     area_ha: 8.0
+    latitude: 45.2168
+    longitude: -123.1953
+    farming_style: regenerative
+    # Jory silty clay loam — volcanic origin, iron-rich, well-drained.
+    # Grapes deliberately kept N-low (high N = vegetative growth, poor fruit).
+    # Cover crops between vine rows. Mycorrhizal inoculants used.
+    # This plot almost never triggers fertiliser alerts — but will frequently
+    # trigger the regenerative alternatives engine.
+    # Maritime climate: wet winters, warm dry summers (like Burgundy).
+    sensor_baselines:
+      moisture: 32.0
+      temperature: 16.0
+      ph: 6.1
+      nitrogen: 38.0      # intentionally low — grapes prefer this
+      phosphorus: 32.0
+      potassium: 145.0
+      ec: 0.4
 
+# Per-sensor simulation parameters (global defaults, overridden by climate_zone below)
 sensors:
   moisture:
     unit: "%"
-    baseline: 35.0
-    drift_per_hour: -0.3         # slowly dries out
+    drift_per_hour: -0.3
     noise_sigma: 0.8
     min: 0.0
     max: 100.0
 
   temperature:
     unit: "°C"
-    baseline: 18.0
-    drift_per_hour: 0.0          # follows diurnal cycle instead
+    drift_per_hour: 0.0          # follows diurnal cycle
     noise_sigma: 0.3
-    min: -5.0
-    max: 45.0
+    min: -10.0
+    max: 50.0
 
   ph:
     unit: ""
-    baseline: 6.8
-    drift_per_hour: 0.001        # very slow natural drift
-    noise_sigma: 0.05
-    min: 3.5
-    max: 9.5
+    drift_per_hour: 0.0005
+    noise_sigma: 0.04
+    min: 3.0
+    max: 10.0
 
   nitrogen:
     unit: "mg/kg"
-    baseline: 85.0
-    drift_per_hour: -0.02
+    drift_per_hour: -0.025
     noise_sigma: 1.5
     min: 0.0
-    max: 250.0
+    max: 300.0
 
   phosphorus:
     unit: "mg/kg"
-    baseline: 45.0
-    drift_per_hour: -0.01
+    drift_per_hour: -0.012
     noise_sigma: 0.8
     min: 0.0
     max: 200.0
 
   potassium:
     unit: "mg/kg"
-    baseline: 130.0
-    drift_per_hour: -0.015
+    drift_per_hour: -0.018
     noise_sigma: 2.0
     min: 0.0
     max: 400.0
 
   ec:
     unit: "dS/m"
-    baseline: 1.1
-    drift_per_hour: 0.002
+    drift_per_hour: 0.003        # slowly accumulates (fertiliser + irrigation)
     noise_sigma: 0.03
     min: 0.0
-    max: 6.0
+    max: 8.0
+
+# Climate zone overrides — applied on top of global sensor params
+climate_zones:
+  continental:                   # Mykola's Ukraine wheat
+    moisture_drift_per_hour: -0.5          # dries faster
+    temperature_diurnal_amplitude: 8.0     # larger day/night swing
+    drought_trigger_days: 10              # drought sets in faster
+    rain_probability_per_hour: 0.04
+
+  arid:                          # Fatima's Uzbekistan cotton
+    moisture_drift_per_hour: -0.9          # evaporates very fast without irrigation
+    temperature_diurnal_amplitude: 10.0    # extreme day/night range
+    ec_drift_per_hour: 0.008               # salt accumulates faster from irrigation
+    drought_trigger_days: 7               # drought is chronic
+    rain_probability_per_hour: 0.01        # almost no rain
+
+  maritime:                      # Elena's Oregon vineyard
+    moisture_drift_per_hour: -0.15         # retains moisture longer
+    temperature_diurnal_amplitude: 4.0     # mild, stable
+    drought_trigger_days: 21              # maritime — slow to drought
+    rain_probability_per_hour: 0.08        # frequent rain (Oregon)
 
 weather_events:
   rain:
-    probability_per_hour: 0.05   # 5% chance of rain event each hour
-    moisture_spike: 20.0         # moisture increases by up to 20%
+    probability_per_hour: 0.05
+    moisture_spike: 20.0
     duration_hours: 2
 
   drought:
-    trigger_days_no_rain: 14     # trigger drought mode after 14 dry days
-    drift_multiplier: 3.0        # moisture drops 3x faster
+    trigger_days_no_rain: 14
+    drift_multiplier: 3.0
 
   heatwave:
     probability_per_hour: 0.01
