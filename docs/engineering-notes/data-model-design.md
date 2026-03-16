@@ -37,7 +37,20 @@ Every log table must have both:
 - `created_at`: when the database row was inserted (automatic, server-set)
 - `logged_at`: when the event actually happened (set by the user)
 
-A farmer applying fertiliser on Monday but only recording it in the app on Wednesday is normal. Without `logged_at`, you cannot reconstruct the true event timeline. This matters enormously for ROI calculations — you need to know the soil readings at the time of application, not the time of data entry.
+**This distinction is critical for the ROI calculation.**
+
+To determine whether a fertiliser application was "unnecessary", TerraSensus cross-references it against the soil sensor readings at the time the fertiliser was *applied* — not the time it was *recorded in the app*. These can be days apart.
+
+Concrete failure scenario without `logged_at`:
+> Farmer applies nitrogen on Monday. Soil reads N = 40 mg/kg (low — application seems justified).
+> It rains Tuesday. By Wednesday, runoff and microbial activity spike N to 95 mg/kg (healthy range).
+> Farmer records the application on Wednesday.
+> Without `logged_at`, the system compares Monday's application against Wednesday's N = 95 reading
+> and incorrectly flags it as *unnecessary* — poisoning the ROI report.
+
+With `logged_at = Monday`, the system correctly looks up Monday's sensor reading (N = 40) and marks the application as justified.
+
+The same logic applies to drought scoring, pH-based recommendations, and EC-based supplier flagging — all of which must be evaluated against conditions *at the time of the decision*, not at the time of data entry.
 
 ---
 
