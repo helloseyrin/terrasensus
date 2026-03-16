@@ -52,6 +52,38 @@ terrasensus/farms/{farm_id}/plots/{plot_id}/sensors/{sensor_name}
 
 The three plots in `config.yaml` are not arbitrary. Each is designed to exercise a specific scenario that a production system must handle correctly.
 
+### Persona overview
+
+| Plot ID | Farmer | Region | Crop | Soil type | Climate |
+|---|---|---|---|---|---|
+| `plot-ukr-001` | Mykola Petrenko | Kherson Oblast, Ukraine | Watermelon (GI) | Chernozem + sandy alluvial | Continental |
+| `plot-uzb-001` | Fatima Yusupova | Ferghana Valley, Uzbekistan | Cotton | Serozem (grey desert soil) | Arid |
+| `plot-ore-001` | Elena Marchetti | Willamette Valley, Oregon | Pinot Noir | Jory silty clay loam (volcanic) | Maritime |
+
+### Crop agronomic characteristics
+
+| Crop | Key nutrient story | EC tolerance | Temperature sensitivity | Primary alert scenario |
+|---|---|---|---|---|
+| Watermelon | N ceiling lower than global (fruiting crop — excess N → vine not fruit); K critical for sweetness | Moderate (max ~3.5 dS/m) | Cold-sensitive — growth stalls below 16°C soil temp | N creeping too high; K falling below fruit-quality floor |
+| Cotton | Salt-adapted — tolerates EC up to 5 dS/m (why it survived Aral Sea salinisation); low N relative to grains | High (max ~5 dS/m) | Heat-loving — critical low 12°C | EC already in warning at baseline; chronic salt accumulation |
+| Pinot Noir | Deliberately N-low — excess N drives vegetative growth, degrades fruit quality; high K for fruit | Low (critical >2 dS/m — grapes are salt-sensitive) | Moderate — maritime climate buffers extremes | False N alarms on a healthy, intentionally deficient vineyard |
+
+### Soil type characteristics
+
+| Soil | Region | Organic matter | pH tendency | Key property | Primary risk |
+|---|---|---|---|---|---|
+| Chernozem (black earth) | Ukraine, steppes | Very high (4–8%) | Neutral (6.5–7.0) | Millennia of grassland decomposition; world's most fertile topsoil | EC accumulation from synthetic fertilisers over time |
+| Serozem (grey desert soil) | Central Asia | Very low (<1%) | Alkaline (7.5–8.5) | Thin, degraded, naturally salt-prone; formed under arid conditions | Salt toxicity from saline flood irrigation; almost no buffering capacity |
+| Jory silty clay loam | Pacific Northwest (volcanic) | Moderate (2–4%) | Slightly acidic (5.5–6.5) | Iron-rich volcanic origin; excellent drainage; well-suited to vine roots | Compaction if cover crops not managed; otherwise highly stable |
+
+### Climate zone simulation parameters
+
+| Climate zone | Plots | Moisture drift/hr | Diurnal temp swing | Rain probability/hr | Drought trigger |
+|---|---|---|---|---|---|
+| Continental | Mykola (Ukraine) | −0.5%/hr | ±8°C | 4% | 10 days no rain |
+| Arid | Fatima (Uzbekistan) | −0.9%/hr | ±10°C | 1% | 7 days no rain |
+| Maritime | Elena (Oregon) | −0.15%/hr | ±4°C | 8% | 21 days no rain |
+
 ### Mykola Petrenko — Watermelon, Kherson Oblast, Ukraine (`plot-ukr-001`)
 **Soil type**: Chernozem (black earth) — among the world's most fertile soils. High organic matter, naturally K-rich.
 **Climate**: Continental — hot dry summers, cold winters. The hot dry continental summer is part of what makes Kherson watermelons exceptional: heat concentrates sugars, and the dry ripening period produces fruit with a flavour and sweetness that is genuinely distinctive.
@@ -71,7 +103,7 @@ This has concrete implications for TerraSensus design:
 - **Soil contamination beyond N-P-K.** Flooding from the dam destruction, fuel from military vehicles, and unexploded ordnance all affect soil chemistry in ways that go beyond TerraSensus's seven sensors. The app should not imply completeness — a damaged plot in Kherson may need heavy metal testing and contamination mapping that TerraSensus cannot provide. The agronomist disclaimer is especially important here.
 - **We do not know the current ground truth.** Without direct contact with farmers currently operating in Kherson Oblast, TerraSensus's representation of this context is necessarily approximate. The simulation uses pre-2022 agronomic baselines. A farmer in this region today is dealing with realities that no soil model can accurately capture from the outside. If this app is ever deployed beyond demonstration, Kherson-region farmers must be involved in validating what the app shows and says about their land.
 
-See `docs/personas.md` (Mykola section) for a full account of what is known, what is not known, and what this means for any future deployment in conflict-affected agricultural regions.
+See `docs/engineering-notes/kherson-context.md` for the full account of what is known, what is not known, and what the Kakhovka dam destruction means for any deployment of this software in conflict-affected agricultural regions.
 
 ### Fatima Yusupova — Cotton, Ferghana Valley, Uzbekistan (`plot-uzb-001`)
 **Soil type**: Serozem (grey desert soil) — thin, low organic matter, naturally alkaline.
