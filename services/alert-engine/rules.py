@@ -42,8 +42,8 @@ CROP_THRESHOLDS: dict[str, dict] = {
         # Needs warm soil. Low N relative to wheat. Alkaline soil tolerance.
         "ph":          {"critical_low": 5.8, "low": 6.5, "high": 8.0, "critical_high": 8.5, "unit": ""},
         "nitrogen":    {"critical_low": 10,  "low": 30,  "high": 100, "critical_high": 130, "unit": "mg/kg"},
-        "temperature": {"critical_low": 12,  "low": 18,  "high": 38,  "critical_high": 42,  "unit": "°C"},
-        "ec":          {"critical_low": 0.1, "low": 0.5, "high": 3.5, "critical_high": 5.0, "unit": "dS/m"},
+        "temperature": {"critical_low": 12,  "low": 18,  "high": 40,  "critical_high": 42,  "unit": "°C"},
+        "ec":          {"critical_low": 0.1, "low": 0.5, "high": 2.0, "critical_high": 5.0, "unit": "dS/m"},
         # ⚠ UNVALIDATED — cotton EC tolerance is well-documented but specific
         # mg/kg values need Central Asian agronomist review
     },

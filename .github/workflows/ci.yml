@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -r services/ingestion/requirements.txt ruff pytest
       - run: ruff check services/ingestion
-      - run: pytest services/ingestion/tests -v
+      - run: cd services/ingestion && pytest tests -v
 
   lint-test-alert-engine:
     name: alert-engine — lint + test
@@ -34,7 +34,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -r services/alert-engine/requirements.txt ruff pytest
       - run: ruff check services/alert-engine
-      - run: pytest services/alert-engine/tests -v
+      - run: cd services/alert-engine && pytest tests -v
 
   lint-test-ai-recommendations:
     name: ai-recommendations — lint + test
@@ -46,7 +46,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -r services/ai-recommendations/requirements.txt ruff pytest
       - run: ruff check services/ai-recommendations
-      - run: pytest services/ai-recommendations/tests -v
+      - run: cd services/ai-recommendations && pytest tests -v
 
   lint-test-lab-parser:
     name: lab-parser — lint + test
@@ -58,7 +58,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -r services/lab-parser/requirements.txt ruff pytest
       - run: ruff check services/lab-parser
-      - run: pytest services/lab-parser/tests -v
+      - run: cd services/lab-parser && pytest tests -v
 
   lint-test-mobile:
     name: mobile — typecheck + lint + test

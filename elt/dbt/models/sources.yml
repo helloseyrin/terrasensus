@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: terrasensus_raw
+    description: Raw tables synced from Cloud SQL to BigQuery via Datastream
+    database: "{{ env_var('GCP_PROJECT_ID', 'terrasensus-dev') }}"
+    schema: terrasensus_raw
+    tables:
+      - name: lab_reports
+        description: Parsed lab report results uploaded by farmers
+      - name: sensor_readings
+        description: Continuous IoT sensor telemetry from plot sensors
