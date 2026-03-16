@@ -8,7 +8,7 @@
 
 ## Premise
 
-TerraSensus works with **real crops, real money, and real food**. A Ukrainian wheat farm
+TerraSensus works with **real crops, real money, and real food**. A Ukrainian watermelon farm
 running this app may be making irrigation decisions that affect several tonnes of food.
 A Central Asian cotton farmer acting on a bad EC recommendation could cause irreversible
 salt damage to their soil — damage that takes years to reverse, if it reverses at all.
@@ -27,7 +27,7 @@ The alert engine evaluates sensor readings against crop-aware thresholds with ze
 external dependencies. It runs whether or not Gemini is up, whether or not the farmer
 has internet, whether or not Anthropic's API is reachable.
 
-A "critical low moisture" alert for Mykola's wheat must fire the moment the sensor
+A "critical low moisture" alert for Mykola's watermelons must fire the moment the sensor
 reading crosses the threshold. Not after a 3-second AI API call. Not after a Pub/Sub
 message round-trip. Immediately, locally, deterministically.
 
@@ -159,7 +159,7 @@ agronomically authoritative until the following are done:
 - [ ] Onboarding prompt output has been tested against real plots for each crop type
 - [ ] Recommendation prompt output has been evaluated against at least 10 real soil profiles per crop
 - [ ] Regional risk outputs have been reviewed by someone with regional agricultural knowledge
-  (Ukrainian agronomy for wheat, Central Asian agronomy for cotton, Pacific Northwest viticulture for Pinot Noir)
+  (Ukrainian watermelon agronomy for Kherson, Central Asian agronomy for cotton, Pacific Northwest viticulture for Pinot Noir)
 - [ ] Agronomic bounds in `client.py: AGRONOMIC_BOUNDS` have been confirmed as safe maximums
 - [ ] At least one farmer from each persona region has reviewed the onboarding output for their crop
 

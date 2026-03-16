@@ -64,7 +64,7 @@ Every AI response displayed in the app carries:
 
 This is not legal boilerplate. It is accurate. The thresholds in `rules.py` are flagged
 unvalidated. The AI has not been evaluated by a domain expert for Central Asian cotton
-agronomy or Ukrainian winter wheat. Until that validation happens, this disclaimer is
+agronomy or Kherson watermelon cultivation. Until that validation happens, this disclaimer is
 the honest truth about what TerraSensus can and cannot claim.
 
 ---
@@ -86,7 +86,7 @@ model outputs against known-good scenarios. This is a prerequisite for removing 
 ## Response Caching Strategy
 
 Onboarding responses are expensive (multi-paragraph AI generation) and change slowly
-(the soil portrait for a Ukrainian wheat field doesn't change week to week). Cache them:
+(the soil portrait for a Kherson watermelon field doesn't change week to week). Cache them:
 
 - **Server**: `onboarding_cache` table in Cloud SQL, TTL 30 days, invalidated if crop or
   region changes

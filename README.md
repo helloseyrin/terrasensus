@@ -161,9 +161,10 @@ terrasensus/
 ├── .claude/                # Claude Code settings + session audit log
 ├── docs/
 │   ├── ADR/                # Architecture Decision Records (001–006)
-│   ├── engineering-notes/  # sensor simulation, ELT, AI, data model, cost-benefit, kherson-context
+│   ├── engineering-notes/  # sensor simulation, ELT, AI, data model, cost-benefit
 │   ├── specs/              # design documents
 │   ├── ai-usage-policy.md  # where AI is and is not acceptable (read before touching AI code)
+│   ├── personas.md         # Mykola (Ukraine/watermelon), Fatima (Uzbekistan/cotton), Elena (Oregon/Pinot Noir)
 │   ├── business-case.md    # problem statement, market opportunity, known unknowns
 │   ├── competitive-analysis.md  # all four repos + farmer insights + CI/CD learnings
 │   ├── backlog.md          # feature backlog (v1 → v3 + icebox)

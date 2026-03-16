@@ -26,7 +26,7 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 - `web/` — Next.js web dashboard
 - `infra/` — Terraform for all GCP resources
 - `shared/types/` — Shared TypeScript types (sensor, lab_report, alert, activity_log, cost_benefit, onboarding)
-- `docs/engineering-notes/kherson-context.md` — honest account of what is and isn't known about farming in Kherson Oblast under conflict; read before modifying the Mykola persona
+- `docs/personas.md` — full farmer personas (Mykola/Fatima/Elena): who they are, pain points, what TerraSensus does for them, why these three; includes Kherson context in Mykola's section
 - `grafana/` — Exported Grafana dashboard JSON configs
 
 ## Data Processing Library Preference
