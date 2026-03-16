@@ -102,6 +102,13 @@ Crop-aware overrides in `services/alert-engine/rules.py: CROP_THRESHOLDS` — wh
 ## Lab Report Schema (extracted fields)
 pH, N (mg/kg), P (mg/kg), K (mg/kg), EC (dS/m), Organic Matter (%), CEC (meq/100g), Ca (mg/kg), Mg (mg/kg), Zn (mg/kg), Fe (mg/kg), sand (%), silt (%), clay (%), sample_depth_cm, plot_id
 
+## Deployment Notes
+
+To deploy to GCP staging:
+1. Add `GCP_SA_KEY` and `GCP_PROJECT_ID` to GitHub → Settings → Secrets → Actions
+2. `git tag staging-YYYY-MM-DD && git push --tags` — this is the only thing that triggers the deploy workflow
+3. Or trigger manually from GitHub Actions UI → Deploy to Staging → Run workflow
+
 ## Known Issues
 <!-- Claude: update this section when bugs are found during development -->
 
