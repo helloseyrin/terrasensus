@@ -50,8 +50,10 @@ Mykola farms conventionally — synthetic fertilisers, irrigation, standard inpu
 - Drought risk scoring from moisture trend + rainfall data — irrigation timing support during fruit-set
 - Fertiliser ROI tracking — connects his applications (logged as activity_log entries) to soil readings at the time
 
+### The Kherson context
+
 <details>
-<summary>⚠ Developer note — Kherson context, occupation, Kakhovka ecocide (written by the repo owner, who is Ukrainian)</summary>
+<summary>⚠ Developer note — written by the repo owner, who is Ukrainian (click to expand)</summary>
 
 The Kherson watermelon is not just an agricultural product. During the Russian occupation, farmers in the region who had always grown watermelons were unable to do so. In that absence the watermelon became a symbol — of Kherson, of what had been taken, of the region itself. At the Ukrainian stand at COP27, a watermelon was displayed alongside a Ukrainian flag. When President Zelenskyy arrived in newly liberated Kherson in November 2022, he joked that he had come because he "wanted a watermelon." Ukrposhta, the Ukrainian national postal service, released watermelon-themed stamps commemorating the liberation. A fruit became a flag. This is why Mykola grows watermelons and not something else. The choice is not incidental.
 
