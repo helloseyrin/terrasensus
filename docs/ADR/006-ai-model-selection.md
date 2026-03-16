@@ -1,56 +1,146 @@
-# ADR 006 — AI Model Selection: Gemini vs Claude vs Others
+# ADR 006 — AI Model Selection and Resilience Architecture
 
 **Date:** 2026-03-16
-**Status:** Decided — Gemini Pro on Vertex AI, with Claude API as documented fallback
+**Status:** Accepted — multi-model fallback chain with agronomic bounds validation
 
 ---
 
-## The Question
+## Context
 
-Is Vertex AI (Gemini Pro) the right model for TerraSensus recommendations, or should we use Claude (Anthropic) or another provider?
+TerraSensus may be used by farmers in food-security-critical contexts — Ukrainian wheat fields, Central Asian cotton farms, smallholder operations where a wrong recommendation or a missed alert could mean crop failure. This raises the reliability bar significantly beyond a typical SaaS product.
 
-## Data Centre Consideration
+Two distinct failure modes must be treated separately:
 
-The question was raised: does Google having the most data centres globally make Gemini the right choice?
+1. **Provider outage** — the AI API is unreachable or returns an error
+2. **Model incorrectness** — the AI is available but returns agronomically wrong advice
 
-**Short answer**: data centre count is not the right metric here. What matters is:
-- **Latency to your Cloud Run region** (europe-west2 for us) — both Vertex AI and Claude API have endpoints in Europe
-- **Accuracy on structured agricultural reasoning tasks** — model quality, not geography
-- **Integration cost** — Vertex AI uses GCP IAM (no separate API key); Claude needs an Anthropic API key and adds an external dependency
-- **Cost per token** — Gemini 1.5 Pro and Claude Sonnet are comparable; Gemini Flash is significantly cheaper for high-frequency calls
+These require different mitigations.
 
-## Honest Model Comparison for This Use Case
+---
 
-| Dimension | Gemini 1.5 Pro (Vertex AI) | Claude Sonnet (Anthropic API) |
+## Provider Uptime — Honest Assessment
+
+No AI provider publishes food-security-grade SLAs. Published figures:
+
+| Provider | Published SLA | Notes |
 |---|---|---|
-| Structured JSON output | ✓ native `application/json` response mime | ✓ via tool use or prompt |
-| Agricultural domain knowledge | Good — trained on broad web corpus | Good — similar training |
-| Long context (full soil profile + history) | ✓ 1M token context | ✓ 200K token context |
-| GCP IAM integration | ✓ native — no separate API key | ✗ external API key required |
-| European data residency | ✓ `europe-west2` endpoint available | Partial — US-primary |
-| Cost (input tokens) | Gemini Flash: very low; Pro: moderate | Sonnet: moderate |
-| Multimodal (lab report images) | ✓ Gemini Vision | ✓ Claude vision |
+| Vertex AI (Gemini Pro) | 99.95% infrastructure | Covers API availability, not model correctness |
+| Anthropic Claude API | No public SLA (standard tier) | Enterprise tier has SLA — unpublished |
+| OpenAI GPT-4 | 99.9% (enterprise) | US-primary infrastructure |
 
-## Decision
+99.95% uptime = ~4.4 hours downtime per year. For a farmer checking soil before an irrigation decision, a 2-hour outage at the wrong moment matters.
 
-**Use Vertex AI (Gemini Pro) as the primary model.** Reasons:
-1. GCP-native IAM eliminates a credential management problem — Cloud Run service accounts get Vertex AI access automatically
-2. Gemini Flash is available for high-frequency, lower-stakes calls (onboarding, threshold explanations) at significantly lower cost
-3. Gemini 1.5 Pro's 1M context window is useful for passing full seasonal history in recommendation calls
-4. Stays within the GCP ecosystem (ADR 001)
+**Conclusion**: no single provider is reliable enough for a food-security context. The architecture must not depend on any one model being available.
 
-**Claude API as a documented optional fallback** for the `ai-recommendations` service specifically, if:
-- Gemini recommendation quality on a specific task proves insufficient
-- A domain expert evaluating the app finds Claude's agricultural reasoning better for their use case
-- The operator prefers Anthropic for policy/compliance reasons
+---
 
-The `ai-recommendations` service is deliberately abstracted behind a `get_vertex_client()` / `call_gemini()` pattern — swapping the model requires changing only those two functions, not the prompts or API endpoints.
+## Decision: Multi-Model Fallback Chain
 
-## What Data Centres Actually Affect
+```
+Request arrives at /onboarding or /recommend
+        │
+        ▼ [1] Primary: Vertex AI (Gemini Pro)
+        │   timeout: 8s
+        │   If fails → log incident → try next
+        │
+        ▼ [2] Fallback: Claude Sonnet (Anthropic API)
+        │   timeout: 8s
+        │   Different provider, different infrastructure, different failure modes
+        │   If fails → log incident → try next
+        │
+        ▼ [3] Final fallback: Rule-based knowledge base (local, no external API)
+            Always available. Returns structured explanation derived from
+            CROP_THRESHOLDS + agronomic reference data embedded in the service.
+            Clearly labelled: "AI service temporarily unavailable —
+            showing guideline-based recommendation."
+```
 
-Data centre proximity matters for:
-- **Sensor ingestion latency** (Pub/Sub → Cloud Run) — GCP europe-west2 is optimal here
-- **Dashboard load time** — BigQuery and Cloud Run in the same region
-- **GDPR compliance** — EU farmer data must stay in EU regions; both GCP and Anthropic have EU endpoints
+**Why two external providers**: Gemini and Claude run on entirely separate infrastructure (Google vs Amazon/AWS). A GCP regional incident that takes down Vertex AI will not affect Anthropic's API. This is the standard pattern for critical systems — diversify infrastructure, not just endpoints.
 
-It does **not** meaningfully affect the quality of a 2–3 second AI recommendation call where the bottleneck is model inference time, not network transit.
+**Why a local fallback**: internet connectivity in rural farming regions is unreliable. A local fallback that requires no external call guarantees the farmer always receives something useful.
+
+---
+
+## Model Correctness — Agronomic Bounds Validation
+
+Uptime is the easier problem. Correctness is harder.
+
+An AI can be available and return plausible-sounding but agronomically harmful advice. Example failure: "apply 400 kg/ha of nitrogen to your wheat field" — this is 2–3× the safe maximum and would cause severe EC buildup and root burn. A confident, well-formatted AI response with a wrong number.
+
+**Mitigation: agronomic bounds checker** — every numeric recommendation from any AI model is validated against hard limits before it reaches the farmer:
+
+```python
+AGRONOMIC_BOUNDS = {
+    "nitrogen_application_kg_ha":    (0, 250),   # never recommend >250 kg/ha N
+    "phosphorus_application_kg_ha":  (0, 120),
+    "potassium_application_kg_ha":   (0, 200),
+    "ph_target":                     (4.5, 8.5), # outside this: reject response
+    "ec_safe_ceiling_ds_m":          (0.0, 5.0),
+}
+```
+
+If a model output contains a value outside bounds: reject the response, fall back to next model, log the anomaly as an AI quality issue (GitHub issue template exists for this).
+
+---
+
+## Model Correctness — Uncertainty Expression
+
+Every AI response must include an explicit uncertainty statement. The onboarding prompt instructs Gemini/Claude to:
+- State when a recommendation is based on general agronomic literature vs region-specific data
+- Flag when the input values are unusual or outside the model's confident range
+- Never present a recommendation as certain when the underlying data is sparse
+
+The onboarding prompt includes: *"If you are uncertain about any recommendation for this specific region or variety, say so explicitly. Uncertainty expressed honestly is more valuable than false confidence."*
+
+---
+
+## The Non-Negotiable Layer: Rule-Based Alerts
+
+The alert engine (`services/alert-engine/rules.py`) **never calls an AI**. It evaluates thresholds synchronously, locally, with no network dependency. A farmer with no internet, a dead phone signal, or during a 6-hour GCP outage still receives:
+
+- Critical moisture alerts (prevent crop death from drought)
+- Critical EC alerts (prevent irreversible salt damage)
+- Critical pH alerts (prevent nutrient lockout)
+- Drought risk scoring (Open-Meteo is the only external call — can be cached)
+
+The rule-based layer is the safety net. The AI layer is the intelligence layer on top of it. These must never be conflated.
+
+---
+
+## Labelling Requirements
+
+Every AI-generated recommendation displayed to a farmer must include:
+
+1. Which model generated it (Gemini / Claude / Rule-based fallback)
+2. The timestamp of generation
+3. A persistent disclaimer: *"This recommendation is AI-generated guidance. For decisions affecting food security or significant financial investment, consult a qualified agronomist."*
+4. A one-tap "flag this recommendation" button that creates a GitHub issue via the `ai-quality` template
+
+---
+
+## Caching for Offline Resilience
+
+Onboarding responses and the most recent recommendation per plot are cached:
+- **Server-side**: 24-hour TTL in Cloud SQL, served from cache if model unavailable
+- **Client-side**: React Native AsyncStorage — last known recommendation survives app restart and offline use
+- **Displayed with**: "Last updated X ago" label when serving cached content
+
+---
+
+## Implementation Stack
+
+```
+services/ai-recommendations/
+├── client.py          ← multi-model client with fallback chain + bounds validation
+├── fallback.py        ← rule-based local knowledge base (no external API)
+├── bounds.py          ← agronomic bounds checker
+└── main.py            ← endpoints (unchanged interface regardless of which model responds)
+```
+
+---
+
+## What This Does Not Solve
+
+- **Domain expert validation of thresholds**: all `CROP_THRESHOLDS` values are flagged `⚠ UNVALIDATED`. No amount of model redundancy fixes agronomically wrong baseline thresholds. Expert review is required before production deployment in food-security contexts.
+- **Hallucination of crop-specific facts**: LLMs can confidently state incorrect agronomic facts. The bounds checker catches dangerous numeric values but cannot catch subtly wrong qualitative advice (e.g. "cotton thrives in waterlogged soil" — false, but not a numeric value to bound-check). This is mitigated by labelling and the agronomist disclaimer, not by code.
+- **Real-time sensor accuracy**: if the sensors themselves are miscalibrated, no AI can compensate. Sensor maintenance logs (phase 2) and periodic lab report cross-referencing are the mitigations.

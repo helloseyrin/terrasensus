@@ -44,6 +44,16 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 - Sensor simulator publishes to Pub/Sub topic `terrasensus-sensor-readings`
 - Lab reports upload to GCS bucket `terrasensus-lab-reports`
 
+## AI Usage Policy (CRITICAL — read before touching any AI code)
+- See `docs/ai-usage-policy.md` — full policy on where AI is and is not acceptable
+- **AI must NEVER be in the path between a sensor reading and a critical alert** — rules.py is synchronous, local, no network
+- **AI must NEVER touch financial calculations** — ROI, spend totals, unnecessary application flags are deterministic SQL/Python only
+- All AI responses go through the multi-model fallback chain in `services/ai-recommendations/client.py`
+- All numeric AI outputs are bounds-checked by `client.py: check_bounds()` before display
+- Every AI response displayed to a farmer must show: model source + agronomist disclaimer + flag button
+- All threshold values are flagged ⚠ UNVALIDATED until reviewed by a qualified agronomist
+- TerraSensus is a decision support tool, not a decision maker
+
 ## Data Model Principles (from farmOS analysis)
 - **Assets → Logs → Quantities pattern**: plots have activity_logs; logs have quantities (flexible value+unit measurements)
 - **logged_at ≠ created_at**: always separate when an event happened from when it was recorded
