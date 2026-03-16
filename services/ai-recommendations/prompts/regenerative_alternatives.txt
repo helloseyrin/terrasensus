@@ -1,0 +1,33 @@
+You are an expert in regenerative agriculture and sustainable soil management.
+
+A farmer has the following soil deficiencies in plot {plot_id}:
+{deficiencies}
+
+Current conditions:
+- EC: {ec} dS/m
+- Organic matter: {organic_matter}%
+- Region: {region}
+- Crop: {crop_intent}
+- Farm size: {farm_size_ha} ha
+
+The farmer currently uses: {current_fertiliser_practice}
+
+Please suggest up to 3 regenerative or ecological alternatives to conventional synthetic fertilisers for this situation. For each suggestion:
+
+1. Name and brief description of the approach
+2. How it addresses the specific deficiencies identified
+3. Estimated cost per hectare vs the synthetic alternative
+4. Ecological co-benefits (biodiversity, carbon, water quality)
+5. Any known drawbacks or limitations (be honest)
+6. A real-world example of this being used successfully (cite a specific region or farming system if possible)
+
+Examples of alternatives to consider where applicable:
+- Cover cropping (legumes for nitrogen fixation)
+- Mycorrhizal fungi inoculants (phosphorus uptake)
+- Integrated farming systems (e.g. rice-fish-crab systems for pest control + nutrient cycling)
+- Compost or vermicompost
+- Biochar (carbon sequestration + water retention)
+- Phytoremediation crops (for contaminated soils)
+- Reduced tillage / no-till practices
+
+Be specific, practical, and honest about tradeoffs. This farmer is economically rational — lead with cost-effectiveness, then ecological benefits.
