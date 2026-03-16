@@ -1,0 +1,11 @@
+terrasensus:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: terrasensus-dev
+      dataset: terrasensus_dev
+      threads: 1
+      timeout_seconds: 300
+      location: EU

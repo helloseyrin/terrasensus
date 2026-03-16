@@ -5,6 +5,11 @@ on:
     branches: [main, staging]
   push:
     branches: [main, staging]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "CLAUDE.md"
+      - "grafana/**"
 
 jobs:
   lint-test-ingestion:
