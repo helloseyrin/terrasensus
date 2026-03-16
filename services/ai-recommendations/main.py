@@ -21,7 +21,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from client import ModelSource, generate_with_fallback
+from client import generate_with_fallback
 
 app = FastAPI(title="TerraSensus AI Recommendations Service")
 PROMPTS_DIR = Path(__file__).parent / "prompts"

@@ -4,8 +4,6 @@ TerraSensus — Drought Risk Module
 Combines Open-Meteo historical rainfall data with soil moisture trends
 to produce a drought risk score (0.0 = no risk, 1.0 = critical drought).
 """
-import httpx
-
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 # Thresholds for drought scoring
