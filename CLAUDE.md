@@ -44,6 +44,14 @@ TerraSensus is an end-to-end soil health assessment platform for farmers. It com
 - Sensor simulator publishes to Pub/Sub topic `terrasensus-sensor-readings`
 - Lab reports upload to GCS bucket `terrasensus-lab-reports`
 
+## Data Model Principles (from farmOS analysis)
+- **Assets → Logs → Quantities pattern**: plots have activity_logs; logs have quantities (flexible value+unit measurements)
+- **logged_at ≠ created_at**: always separate when an event happened from when it was recorded
+- **Logs are immutable**: never DELETE logs — they are financial/legal records; errors get a corrective log entry
+- **GeoJSON geometry on plots**: store field boundaries as JSONB, not just lat/lng
+- **Sensor readings are NOT logs**: continuous telemetry lives in `sensor_readings`; discrete human events live in `activity_logs`
+- See `docs/engineering-notes/data-model-design.md` and `docs/competitive-analysis-farmos.md`
+
 ## Phase Roadmap
 - **Phase 1 (current)**: Simulated sensor data via `simulator/sensor_simulator.py` + Pub/Sub
 - **Phase 2**: Replace simulator with **PySensorMQTT** for real MQTT hardware sensor integration. The simulator's output schema intentionally matches what PySensorMQTT would publish — ingestion service requires no changes on switch-over. MQTT topic structure: `terrasensus/farms/{farm_id}/plots/{plot_id}/sensors/{sensor_name}`

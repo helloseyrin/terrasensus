@@ -2,6 +2,13 @@
 
 Managed here as a running list. Detailed tracking is in GitHub Projects.
 
+## v1 — Skeleton & Foundation (farmOS-informed data model additions)
+- [ ] Add `activity_logs` + `quantities` tables to Cloud SQL schema (farmOS Log/Quantity pattern)
+- [ ] Add `crop_cycles` table (planting → harvest lifecycle per plot)
+- [ ] Add `geometry` GeoJSON field to plots (enables field boundary mapping)
+- [ ] Define OpenAPI spec for ingestion service REST API (farmOS uses JSON:API — we need a spec)
+- [ ] Add `logged_at` field to all log tables (when event happened, separate from `created_at`)
+
 ## v1 — Skeleton & Foundation
 - [ ] GCP infrastructure (Terraform): Cloud SQL, Pub/Sub, GCS, Cloud Run, BigQuery
 - [ ] Sensor simulator: continuous time-series with drift, noise, weather events
