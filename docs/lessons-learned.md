@@ -72,3 +72,10 @@ A running log of mistakes, unexpected behaviour, and what was done to fix them. 
 **Root cause:** Data centre count is a marketing number, not an SLA. What matters for a food-security application is: (a) whether the fallback runs on genuinely separate infrastructure from the primary, (b) whether a single regional GCP incident can affect both primary and fallback, and (c) whether the fallback can handle correctness failures (wrong values), not just availability failures.
 **Fix:** Decision reframed around two failure modes — availability failure (API down) and correctness failure (API returns bad values). Architecture: Gemini primary (GCP IAM, native), Claude fallback (Anthropic/AWS — separate infrastructure), rule-based local (no network). Bounds checker (`check_bounds()`) handles correctness failures by triggering fallback when numeric values exceed agronomic limits. See ADR 006.
 **Takeaway:** For resilience design, ask "what happens when each failure mode occurs?" not "who has more data centres?" Two-provider strategy is only meaningful if the providers run on separate cloud infrastructure.
+
+### [2026-03-17] Terraform role and when to use it
+**Service/Component:** `infra/` (Terraform files)
+**What happened:** Terraform was listed in the stack but its purpose and timing were unclear — it had never been explicitly discussed and wasn't mentioned in the README workflow.
+**Root cause:** Terraform was written alongside the app code (good practice) but never explained in the docs. The `infra/` directory exists with `.tf` files for Cloud SQL, Cloud Run, BigQuery, Pub/Sub, and GCS, but no doc explained when or why to run it.
+**Fix/Decision:** Terraform is Phase 4 tooling — run `terraform apply` once when deploying to GCP for real. Until then everything runs locally via `docker-compose`. The MVP0 checklist (`docs/mvp0-checklist.md`) now lists Terraform as the first infrastructure step.
+**Takeaway:** Any tool in the stack that isn't part of the local dev loop needs a sentence in the README or docs explaining when it enters the picture.
