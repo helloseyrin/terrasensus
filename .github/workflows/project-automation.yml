@@ -1,0 +1,50 @@
+name: Project automation
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  add-to-project:
+    name: Add to board on open
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened' || github.event.action == 'reopened'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/helloseyrin/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+
+  archive-on-close:
+    name: Set Done when closed
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        id: add
+        with:
+          project-url: https://github.com/users/helloseyrin/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - name: Set status to Done
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          ITEM_ID: ${{ steps.add.outputs.itemId }}
+          PROJECT_ID: PVT_kwHOCxx-o84BR88t
+          FIELD_ID: PVTSSF_lAHOCxx-o84BR88tzg_oL4Y
+          OPTION_ID: "98236657"
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $project
+                itemId: $item
+                fieldId: $field
+                value: { singleSelectOptionId: $option }
+              }) { projectV2Item { id } }
+            }' \
+            -f project="$PROJECT_ID" \
+            -f item="$ITEM_ID" \
+            -f field="$FIELD_ID" \
+            -f option="$OPTION_ID"
